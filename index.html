@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>วัดความรุ้เกี่ยวกับตัวไอเชี้ย(สุ)</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        text-align: center;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+      }
+
+      .question-container {
+        background: #fff;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 600px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 2em;
+      }
+
+      .score-board {
+        font-size: 1.2em;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 12px 20px;
+        margin: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        max-width: 250px;
+        box-sizing: border-box;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .message {
+        font-size: 1.5em;
+        color: #ff6347;
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      #confirm-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #2196f3;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        font-size: 18px;
+      }
+
+      #confirm-button:hover {
+        background-color: #1976d2;
+      }
+
+      .answer-result {
+        font-size: 1.2em;
+        color: #ff6347;
+        margin-top: 10px;
+      }
+
+      .choices {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .choice-item {
+        margin: 10px 0;
+      }
+
+      .choice-item button {
+        width: 100%;
+        max-width: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>วัดความรุ้เกี่ยวกับตัวไอเชี้ย(สุ)</h1>
+    <div id="question-container" class="question-container">
+      <p id="question">คำถามจะปรากฏที่นี่</p>
+      <ul id="choices" class="choices"></ul>
+      <p id="score-board" class="score-board">นี้คือค้อ 1 จาก 10</p>
+      <button id="confirm-button" class="hidden">
+        กรูมั่นใจคร่ะขอข้อที่ยากกว่านี้
+      </button>
+      <p id="message" class="message hidden">ข้อความแสดงผลจะอยู่ที่นี่</p>
+      <p id="answer-result" class="answer-result hidden"></p>
+    </div>
+
+    <audio
+      id="correct-sound"
+      src="https://www.soundjay.com/button/beep-07.wav"
+    ></audio>
+    <audio
+      id="wrong-sound"
+      src="https://www.soundjay.com/button/beep-10.wav"
+    ></audio>
+
+    <script>
+      const questions = [
+        {
+          question: "ความสูงของมันส์?",
+          choices: ["สูง 181.5cm", "สูง 181.4 cm", "สูง 181.3 cm"],
+          answer: 2,
+        },
+        {
+          question: "สุชอบสัตว์อะไร(ง่ายมาก)?",
+          choices: [
+            "จิ้กโจ้ไงเพราะมันเท่",
+            "วรนุช(น้อนน่ารัก)",
+            "เเมวงัยยอุ้งๆ",
+          ],
+          answer: 0,
+        },
+        {
+          question: "ทำไมไอ้นี่มันชอบไป รร สาย?",
+          choices: [
+            "เพราะเเม่งตื่นสาย",
+            "มัวเเต่ร้องเพลงในห้องนํ้า",
+            "แม่งขับรถช้า",
+          ],
+          answer: 1,
+        },
+        {
+          question: "มันด์ชอบดริ๊งนํ้าไรที่สูบบ?",
+          choices: [
+            "ก็นํ้าส้วมงัยอร่อยจั้ด",
+            "นํ้าเเด้งเเม่งก็น่าใช่วะ",
+            "นํ้าโค้กเพราะเเม่งซ่าส์อร่อยเสียว",
+          ],
+          answer: 1,
+        },
+        {
+          question: "แล้วไอ้นี่มันเล่นกีราอะไรได้ดีบ้าง?",
+          choices: [
+            "ดีหมดอ่ะเพราะเเม่งเท่",
+            "แม่งน่าจัเป็นบอลกับบาสรึป๊าว",
+            "ไม่มีอ่ะเเม่งไม่มีเหรี้ยไรดี",
+          ],
+          answer: 2,
+        },
+        {
+          question: "เวลาว่างมันชอบทำอะไร?",
+          choices: [
+            "ชอบนอนเล่นเกมมส์(ตริ้ว)",
+            "ชอบอ่านหนังสือทบทวนบดเรียน",
+            "ชอบทำตัวหล่อกินเวลาเปล่าๆ",
+          ],
+          answer: 1,
+        },
+        {
+          question: "สุ๊ชอบสีรัยย?",
+          choices: ["สีส่ะหวาด", "สีเหย", "สะสะหยวย"],
+          answer: 2, // Fixed the answer index here
+        },
+        {
+          question: "มันชอบเล่นไรรร?",
+          choices: ["วิ่งเว่า", "นอนเว้น", "จะไปรู้กับมึงหรอว่ะ"],
+          answer: 2,
+        },
+        {
+          question: "คบกับเเฟนมานานเเค่ไหน?",
+          choices: ["ก็4เดือนไงง", "4เดือนรึเปล่าวะ", "4เดือนหล่ะมั้งกูเดา"],
+          answer: 2,
+        },
+        {
+          question: "คำถามสุดท้าย(ตึงมั้ย)?",
+          choices: ["อาจจะตึงอยุ่นะะ", "กรูว่าเกือบตึงว่ะะ", "ใกล้ตึงละอีกนิส"],
+          answer: 1,
+        },
+      ];
+
+      let currentQuestion = 1;
+      let score = 0;
+      let selectedChoice = null;
+
+      function loadQuestion() {
+        const questionElement = document.getElementById("question");
+        const choicesContainer = document.getElementById("choices");
+        const confirmButton = document.getElementById("confirm-button");
+        const messageElement = document.getElementById("message");
+        const scoreBoard = document.getElementById("score-board");
+        const answerResult = document.getElementById("answer-result");
+
+        questionElement.textContent = questions[currentQuestion].question;
+        const choices = questions[currentQuestion].choices;
+
+        // Update the score board
+        scoreBoard.textContent = `ข้อที่ ${currentQuestion + 1} จาก ${
+          questions.length
+        }`;
+
+        choicesContainer.innerHTML = ""; // Clear previous choices
+        choices.forEach((choice, index) => {
+          const listItem = document.createElement("li");
+          listItem.classList.add("choice-item");
+
+          const button = document.createElement("button");
+          button.textContent = choice;
+          button.onclick = () => {
+            // If there's already a selection, remove the previous highlight
+            if (selectedChoice !== null) {
+              const previousChoiceButton =
+                choicesContainer.children[selectedChoice].querySelector(
+                  "button"
+                );
+              previousChoiceButton.style.backgroundColor = "";
+            }
+            // Highlight the selected answer
+            selectedChoice = index;
+            button.style.backgroundColor = "#add8e6"; // Highlight the selected option
+          };
+
+          listItem.appendChild(button);
+          choicesContainer.appendChild(listItem);
+        });
+
+        confirmButton.classList.remove("hidden");
+        confirmButton.onclick = confirmAnswer;
+        messageElement.classList.add("hidden");
+        answerResult.classList.add("hidden");
+      }
+
+      function confirmAnswer() {
+        const correctAnswer = questions[currentQuestion].answer;
+        const correctSound = document.getElementById("correct-sound");
+        const wrongSound = document.getElementById("wrong-sound");
+        const answerResult = document.getElementById("answer-result");
+
+        if (selectedChoice === correctAnswer) {
+          correctSound.play();
+          score++;
+          answerResult.textContent = "งั้นๆเเหละเเค่เดาถูก";
+          answerResult.style.color = "#4caf50";
+        } else {
+          wrongSound.play();
+          answerResult.textContent = "ผิดคั้ปไอ้เด้กออ";
+          answerResult.style.color = "#ff6347";
+        }
+
+        answerResult.classList.remove("hidden");
+
+        currentQuestion++;
+        selectedChoice = null;
+
+        // Wait for a second then load the next question
+        if (currentQuestion < questions.length) {
+          setTimeout(loadQuestion, 1000); // Wait for 1 second before loading next question
+        } else {
+          const messageElement = document.getElementById("message");
+          messageElement.textContent = `ชิ๊! ถูเเค่..... ${score}/${questions.length} เองหรอกรากมาก`;
+          messageElement.classList.remove("hidden");
+          document.getElementById("choices").innerHTML = "";
+          document.getElementById("confirm-button").classList.add("hidden");
+        }
+      }
+
+      loadQuestion();
+    </script>
+  </body>
+</html>
